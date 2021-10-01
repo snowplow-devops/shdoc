@@ -1,4 +1,4 @@
-#!/usr/bin/gawk -f
+#!/usr/bin/env gawk -f
 # vim: ft=awk ts=4 sw=4
 
 BEGIN {
@@ -196,7 +196,7 @@ function render_docblock(func_name, description, docblock) {
     }
 
     if ("arg" in docblock) {
-        push(lines, render("h4", "Arguments") "\n")
+        push(lines, render("h4", "Arguments"))
         for (i in docblock["arg"]) {
             item = docblock["arg"][i]
             item = render("argN", item)
@@ -225,7 +225,7 @@ function render_docblock(func_name, description, docblock) {
     }
 
     if ("stdin" in docblock) {
-        push(lines, render("h4", "Input on stdin") "\n")
+        push(lines, render("h4", "Input on stdin"))
         for (i in docblock["stdin"]) {
             item = render("li", docblock["stdin"][i])
             if (i == length(docblock["stdin"])) {
@@ -236,7 +236,7 @@ function render_docblock(func_name, description, docblock) {
     }
 
     if ("stdout" in docblock) {
-        push(lines, render("h4", "Output on stdout") "\n")
+        push(lines, render("h4", "Output on stdout"))
         for (i in docblock["stdout"]) {
             item = render("li", docblock["stdout"][i])
             if (i == length(docblock["stdout"])) {
@@ -246,8 +246,19 @@ function render_docblock(func_name, description, docblock) {
         }
     }
 
+    if ("output" in docblock) {
+        push(lines, render("h4", "Output variables"))
+        for (i in docblock["output"]) {
+            item = render("li", docblock["output"][i])
+            if (i == length(docblock["output"])) {
+                item = item "\n"
+            }
+            push(lines, item)
+        }
+    }
+
     if ("see" in docblock) {
-        push(lines, render("h4", "See also") "\n")
+        push(lines, render("h4", "See also"))
         for (i in docblock["see"]) {
             item = render("li", render_toc_link(docblock["see"][i]))
             if (i == length(docblock["see"])) {
@@ -259,6 +270,7 @@ function render_docblock(func_name, description, docblock) {
 
 
     result = join(lines)
+    push(lines, "\n\n")
     delete lines
     return join(lines)
 }
@@ -404,6 +416,15 @@ in_example {
     next
 }
 
+/^[[:space:]]*# @output/ {
+    debug("→ @output")
+
+    sub(/^[[:space:]]*# @output /, "")
+
+    docblock_push("output", $0)
+
+    next
+}
 /^[ \t]*(function([ \t])+)?([a-zA-Z0-9_:-\\.]+)([ \t]*)(\(([ \t]*)\))?[ \t]*\{/ \
     && (length(docblock) != 0 || description != "") && !in_example {
     debug("→ function")
