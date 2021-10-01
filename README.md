@@ -265,10 +265,10 @@ Arch Linux users can install shdoc using package in AUR: [shdoc-git](https://aur
 
 ### Using Git
 
-NOTE: shdoc requires gawk: `apt-get install gawk`
+NOTE: shdoc requires gawk: `apt-get install gawk` or `brew install gawk`
 
 ```bash
-git clone --recursive https://github.com/reconquest/shdoc
+git clone --recursive https://github.com/snowplow-devops/shdoc
 cd shdoc
 sudo make install
 ```
